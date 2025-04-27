@@ -1,24 +1,30 @@
+import DownloadPicture from "@/components/DownLoadButton";
 import { ImageCard } from "@/components/ImageCard";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { ThemedView } from "@/components/ThemedView";
 import { useWallpapers } from "@/hooks/useWallpapers";
 import { Wallpaper } from "@/hooks/useWallpapers";
 import { Link } from "expo-router";
-import { Image, Text, View, FlatList, useWindowDimensions } from "react-native";
+import { useState } from "react";
+import { Image, Text, FlatList, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function explore() {
   const wallpapers = useWallpapers();
   const { width } = useWindowDimensions();
+  const [selectedWallPaper,setSelectedWallpaper] = useState<Wallpaper | null>(null);
 
   const itemWidth = (width - 80) / 2;
   
   const renderWallpaperItem = ({ item }: { item: Wallpaper }) => (
-    <View className="p-1" style={{ width: itemWidth }}>
+    <ThemedView className="p-1" style={{ width: itemWidth }}>
       <ImageCard
+      onPress={() =>{ setSelectedWallpaper(item)}}
         wallpaper={item}
         className="rounded-lg overflow-hidden"
       />
-    </View>
+    </ThemedView>
   );
 
   return (
@@ -30,7 +36,7 @@ export default function explore() {
             className="flex-1 w-full h-full"
             style={{ resizeMode: "cover" }}
             source={{
-              uri: "https://ideogram.ai/assets/progressive-image/balanced/response/w5pvrAMDSgGuXYTZXrIWOg",
+              uri: "https://ideogram.ai/assets/progressive-image/balanced/response/MbKPsa9KQtGV9uPXhyOFpg",
             }}
           />
         }
@@ -41,7 +47,7 @@ export default function explore() {
             <Text className="dark:text-white text-black mb-6">Account Info</Text>
           </Link>
 
-          <View className="mt-2 px-2">
+          <ThemedView className="mt-2 px-2">
             <FlatList
               data={wallpapers}
               renderItem={renderWallpaperItem}
@@ -55,9 +61,10 @@ export default function explore() {
               style={{ width: '100%' }}
               columnWrapperStyle={{ justifyContent: 'space-between' }}
             />
-          </View>
+          </ThemedView>
         </View>
       </ParallaxScrollView>
+      {selectedWallPaper && <DownloadPicture isVisible={!!selectedWallPaper} onClose={()=> setSelectedWallpaper(null)} wallPaper={selectedWallPaper} />}
     </SafeAreaView>
   );
 }
