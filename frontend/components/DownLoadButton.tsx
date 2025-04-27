@@ -1,11 +1,12 @@
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect, useContext } from "react";
 import { Text, StyleSheet, View, Image, TouchableOpacity, Platform } from "react-native";
-import { Wallpaper } from "@/hooks/useWallpapers";
+import { FullWallpaper } from "@/hooks/useWallpapers";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemedText } from "./ThemedText";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import BottomSheetWeb from "./BottomSheetWeb";
+import { WallPaperContext } from "@/context/WallPaperContext";
 
 // Config to silence findDOMNode warnings on web
 const bottomSheetConfig = Platform.OS === 'web' 
@@ -15,7 +16,7 @@ const bottomSheetConfig = Platform.OS === 'web'
 interface DownloadPictureProps {
   isVisible: boolean;
   onClose: () => void;
-  wallPaper?: Wallpaper;
+  wallPaper?: FullWallpaper;
 }
 
 export const DownloadPicture = ({
@@ -24,6 +25,8 @@ export const DownloadPicture = ({
   wallPaper,
 }: DownloadPictureProps) => {
   const { isDark } = useTheme();
+  const { toggleLike } = useContext(WallPaperContext);
+  
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -41,6 +44,12 @@ export const DownloadPicture = ({
     },
     [onClose]
   );
+  
+  const handleLikePress = () => {
+    if (wallPaper) {
+      toggleLike(wallPaper);
+    }
+  };
 
   // Effect to handle opening
   useEffect(() => {
@@ -53,14 +62,14 @@ export const DownloadPicture = ({
     }
   }, [isVisible]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !wallPaper) return null;
 
   const contentComponent = (
     <View style={styles.contentContainer}>
       <Image
         style={styles.image}
         className="w-full h-full rounded-lg"
-        source={{ uri: wallPaper?.url || "" }}
+        source={{ uri: wallPaper.url || "" }}
       />
       <View
         className="absolute left-5 top-5 z-50 p-2 rounded-full bg-black/50 "
@@ -85,17 +94,17 @@ export const DownloadPicture = ({
           className="my-auto bg-black/50 rounded-full p-2"
           color={isDark ? "#FF1493" : "white"}
         />
-               <Ionicons
-          name="heart"
+        <Ionicons
+          name={wallPaper.liked ? "heart" : "heart-outline"}
           size={18}
-          onPress={onClose}
           className="my-auto bg-black/50 rounded-full p-2"
-          color={isDark ? "#FF1493" : "white"}
+          onPress={handleLikePress}
+          color={wallPaper.liked ? "#FF1493" : "white"}
         />
       </View>
 
       <View className="flex flex-col justify-center items-center">
-        <ThemedText className="mt-3 font-bold text-3xl">{wallPaper?.name}</ThemedText>
+        <ThemedText className="mt-3 font-bold text-3xl">{wallPaper.name}</ThemedText>
         <TouchableOpacity className="flex flex-row button mt-5 w-fit">
           <Ionicons name="download" size={18} color={isDark ? "#FF1493" : "white"} />
           <Text className="text-white text-center px-2">Download </Text>
@@ -136,7 +145,7 @@ export const DownloadPicture = ({
           <Image
             style={styles.image}
             className="w-full h-full rounded-lg"
-            source={{ uri: wallPaper?.url || "" }}
+            source={{ uri: wallPaper.url || "" }}
           />
           <View
             className="absolute left-5 top-5 z-50 p-2 rounded-full bg-black/50 "
@@ -161,17 +170,17 @@ export const DownloadPicture = ({
               className="my-auto bg-black/50 rounded-full p-2"
               color={isDark ? "#FF1493" : "white"}
             />
-                   <Ionicons
-              name="heart"
+            <Ionicons
+              name={wallPaper.liked ? "heart" : "heart-outline"}
               size={18}
-              onPress={onClose}
               className="my-auto bg-black/50 rounded-full p-2"
-              color={isDark ? "#FF1493" : "white"}
+              onPress={handleLikePress}
+              color={wallPaper.liked ? "#FF1493" : "white"}
             />
           </View>
    
           <View className="flex flex-col justify-center items-center">
-            <ThemedText className="mt-3 font-bold text-3xl">{wallPaper?.name}</ThemedText>
+            <ThemedText className="mt-3 font-bold text-3xl">{wallPaper.name}</ThemedText>
             <TouchableOpacity className="flex flex-row button mt-5 w-fit">
               <Ionicons name="download" size={18} color={isDark ? "#FF1493" : "white"} />
               <Text className="text-white text-center px-2">Download </Text>

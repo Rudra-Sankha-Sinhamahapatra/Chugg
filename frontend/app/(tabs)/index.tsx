@@ -1,24 +1,15 @@
 import DownloadPicture from "@/components/DownLoadButton"; 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import SplitView from "@/components/SplitView";
-import { useWallpapers } from "@/hooks/useWallpapers";
-import { Image, useWindowDimensions } from "react-native";
+import { Image, Text, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { WallPaperContext, WallpaperProvider } from "@/context/WallPaperContext";
+import { WallPaperContext } from "@/context/WallPaperContext";
 import { useContext } from "react";
+import { Link } from "expo-router";
 
 export default function explore() {
-  return (
-   <WallpaperProvider>
-    <ExploreScreen/>
-   </WallpaperProvider>
-  );
-}
-
-function ExploreScreen() {
-  const wallpapers = useWallpapers();
   const { width } = useWindowDimensions();
-  const { selectedWallpaper, setSelectedWallpaper } = useContext(WallPaperContext);
+  const { selectedWallpaper, setSelectedWallpaper, wallpapers } = useContext(WallPaperContext);
   
   return (
     <SafeAreaView className="flex-1">
@@ -34,9 +25,13 @@ function ExploreScreen() {
           />
         }
       >
+           <Text className="dark:text-white text-black mb-4">Explore Page</Text>
+           <Link href="/accountinfo">
+            <Text className="dark:text-white text-black mb-6">Account Info</Text>
+          </Link>
         <SplitView wallpapers={wallpapers} width={width} />
       </ParallaxScrollView>
       {selectedWallpaper && <DownloadPicture isVisible={!!selectedWallpaper} onClose={()=> setSelectedWallpaper(null)} wallPaper={selectedWallpaper} />}
     </SafeAreaView>
-  )
+  );
 }

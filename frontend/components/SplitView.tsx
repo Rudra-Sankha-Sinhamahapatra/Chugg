@@ -1,15 +1,13 @@
 import { FlatList } from "react-native";
 import { ThemedView } from "./ThemedView";
 import { View } from "react-native";
-import { Link } from "expo-router";
-import { Text } from "react-native";
-import { Wallpaper } from "@/hooks/useWallpapers";
+import { FullWallpaper } from "@/hooks/useWallpapers";
 import { ImageCard } from "./ImageCard";
 import { WallPaperContext } from "@/context/WallPaperContext";
 import { useContext } from "react";
 
 interface SplitViewProps {
-    wallpapers: Wallpaper[];
+    wallpapers: FullWallpaper[];
     width: number;
 }
 
@@ -18,7 +16,7 @@ export default function SplitView({wallpapers,width}: SplitViewProps) {
 
     const itemWidth = (width - 80) / 2;
   
-    const renderWallpaperItem = ({ item }: { item: Wallpaper }) => (
+    const renderWallpaperItem = ({ item }: { item: FullWallpaper }) => (
       <ThemedView className="p-1" style={{ width: itemWidth }}>
         <ImageCard
         onPress={() =>{ setSelectedWallpaper(item)}}
@@ -30,11 +28,6 @@ export default function SplitView({wallpapers,width}: SplitViewProps) {
 
     return (
         <View className="pb-6">
-          <Text className="dark:text-white text-black mb-4">Explore Page</Text>
-          <Link href="/accountinfo">
-            <Text className="dark:text-white text-black mb-6">Account Info</Text>
-          </Link>
-
           <ThemedView className="mt-2 px-2">
             <FlatList
               data={wallpapers}

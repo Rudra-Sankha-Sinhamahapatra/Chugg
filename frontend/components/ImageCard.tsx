@@ -1,10 +1,10 @@
-import { Wallpaper } from "@/hooks/useWallpapers";
+import { FullWallpaper, Wallpaper } from "@/hooks/useWallpapers";
 import { Image, Pressable, View } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/useTheme";
 
-export function ImageCard({ wallpaper, className,onPress }: { wallpaper: Wallpaper, className?: string,onPress?:() => void }) {
+export function ImageCard({ wallpaper, className,onPress }: { wallpaper: FullWallpaper, className?: string,onPress?:() => void }) {
   const { isDark } = useTheme();
   
 
@@ -22,7 +22,7 @@ export function ImageCard({ wallpaper, className,onPress }: { wallpaper: Wallpap
       name="heart"
       size={18}
       className="my-auto"
-      color={isDark? '#FF1493' : 'white'}
+      color={wallpaper.liked ? '#FF1493' : 'white'}
       />
       </View>
     </View>
