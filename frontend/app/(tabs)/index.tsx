@@ -1,32 +1,25 @@
-import DownloadPicture from "@/components/DownLoadButton";
-import { ImageCard } from "@/components/ImageCard";
+import DownloadPicture from "@/components/DownLoadButton"; 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedView } from "@/components/ThemedView";
+import SplitView from "@/components/SplitView";
 import { useWallpapers } from "@/hooks/useWallpapers";
-import { Wallpaper } from "@/hooks/useWallpapers";
-import { Link } from "expo-router";
-import { useState } from "react";
-import { Image, Text, FlatList, useWindowDimensions } from "react-native";
-import { View } from "react-native";
+import { Image, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { WallPaperContext, WallpaperProvider } from "@/context/WallPaperContext";
+import { useContext } from "react";
 
 export default function explore() {
+  return (
+   <WallpaperProvider>
+    <ExploreScreen/>
+   </WallpaperProvider>
+  );
+}
+
+function ExploreScreen() {
   const wallpapers = useWallpapers();
   const { width } = useWindowDimensions();
-  const [selectedWallPaper,setSelectedWallpaper] = useState<Wallpaper | null>(null);
-
-  const itemWidth = (width - 80) / 2;
+  const { selectedWallpaper, setSelectedWallpaper } = useContext(WallPaperContext);
   
-  const renderWallpaperItem = ({ item }: { item: Wallpaper }) => (
-    <ThemedView className="p-1" style={{ width: itemWidth }}>
-      <ImageCard
-      onPress={() =>{ setSelectedWallpaper(item)}}
-        wallpaper={item}
-        className="rounded-lg overflow-hidden"
-      />
-    </ThemedView>
-  );
-
   return (
     <SafeAreaView className="flex-1">
       <ParallaxScrollView
@@ -41,30 +34,9 @@ export default function explore() {
           />
         }
       >
-        <View className="pb-6">
-          <Text className="dark:text-white text-black mb-4">Explore Page</Text>
-          <Link href="/accountinfo">
-            <Text className="dark:text-white text-black mb-6">Account Info</Text>
-          </Link>
-
-          <ThemedView className="mt-2 px-2">
-            <FlatList
-              data={wallpapers}
-              renderItem={renderWallpaperItem}
-              keyExtractor={(_, index) => `wallpaper-${index}`}
-              numColumns={2}
-              scrollEnabled={false}
-              initialNumToRender={4}
-              maxToRenderPerBatch={10}
-              windowSize={5}
-              removeClippedSubviews={true}
-              style={{ width: '100%' }}
-              columnWrapperStyle={{ justifyContent: 'space-between' }}
-            />
-          </ThemedView>
-        </View>
+        <SplitView wallpapers={wallpapers} width={width} />
       </ParallaxScrollView>
-      {selectedWallPaper && <DownloadPicture isVisible={!!selectedWallPaper} onClose={()=> setSelectedWallpaper(null)} wallPaper={selectedWallPaper} />}
+      {selectedWallpaper && <DownloadPicture isVisible={!!selectedWallpaper} onClose={()=> setSelectedWallpaper(null)} wallPaper={selectedWallpaper} />}
     </SafeAreaView>
-  );
+  )
 }

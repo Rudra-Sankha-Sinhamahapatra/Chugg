@@ -1,10 +1,16 @@
 import React, { useCallback, useRef, useEffect } from "react";
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { Text, StyleSheet, View, Image, TouchableOpacity, Platform } from "react-native";
 import { Wallpaper } from "@/hooks/useWallpapers";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemedText } from "./ThemedText";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheetWeb from "./BottomSheetWeb";
+
+// Config to silence findDOMNode warnings on web
+const bottomSheetConfig = Platform.OS === 'web' 
+  ? { unstable_enableUserSelectHack: true, enableFlashScrollableIndicator: false } 
+  : {};
 
 interface DownloadPictureProps {
   isVisible: boolean;
@@ -23,6 +29,7 @@ export const DownloadPicture = ({
 
   // snap points
   const snapPoints = ["85%"];
+  const snapPointsWeb = [85]; // For web bottom sheet (percentage)
 
   // callbacks
   const handleSheetChanges = useCallback(
@@ -37,14 +44,78 @@ export const DownloadPicture = ({
 
   // Effect to handle opening
   useEffect(() => {
-    if (isVisible) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
+    if (Platform.OS !== 'web' && bottomSheetRef.current) {
+      if (isVisible) {
+        bottomSheetRef.current?.expand();
+      } else {
+        bottomSheetRef.current?.close();
+      }
     }
   }, [isVisible]);
 
   if (!isVisible) return null;
+
+  const contentComponent = (
+    <View style={styles.contentContainer}>
+      <Image
+        style={styles.image}
+        className="w-full h-full rounded-lg"
+        source={{ uri: wallPaper?.url || "" }}
+      />
+      <View
+        className="absolute left-5 top-5 z-50 p-2 rounded-full bg-black/50 "
+        style={styles.IconView}
+      >
+        <Ionicons
+          name="close"
+          size={18}
+          onPress={onClose}
+          className="my-auto"
+          color={isDark ? "#FF1493" : "white"}
+        />
+      </View>
+      <View
+        className="flex flex-row gap-2 absolute right-5 top-2 z-50 p-2 rounded-full "
+        style={styles.IconView}
+      >
+        <Ionicons
+          name="share"
+          size={18}
+          onPress={onClose}
+          className="my-auto bg-black/50 rounded-full p-2"
+          color={isDark ? "#FF1493" : "white"}
+        />
+               <Ionicons
+          name="heart"
+          size={18}
+          onPress={onClose}
+          className="my-auto bg-black/50 rounded-full p-2"
+          color={isDark ? "#FF1493" : "white"}
+        />
+      </View>
+
+      <View className="flex flex-col justify-center items-center">
+        <ThemedText className="mt-3 font-bold text-3xl">{wallPaper?.name}</ThemedText>
+        <TouchableOpacity className="flex flex-row button mt-5 w-fit">
+          <Ionicons name="download" size={18} color={isDark ? "#FF1493" : "white"} />
+          <Text className="text-white text-center px-2">Download </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  // BottomSheet for web
+  if (Platform.OS === 'web') {
+    return (
+      <BottomSheetWeb 
+        isVisible={isVisible} 
+        onClose={onClose}
+        snapPoints={snapPointsWeb}
+      >
+        {contentComponent}
+      </BottomSheetWeb>
+    );
+  }
 
   // renders
   return (
@@ -59,9 +130,9 @@ export const DownloadPicture = ({
         handleStyle={{ display: "none" }}
         backgroundStyle={styles.sheetBackground}
         handleIndicatorStyle={styles.indicator}
+        {...bottomSheetConfig}
       >
         <BottomSheetView style={styles.contentContainer}>
-          {/* <Text className='mb-5'>Awesome 🎉</Text> */}
           <Image
             style={styles.image}
             className="w-full h-full rounded-lg"
